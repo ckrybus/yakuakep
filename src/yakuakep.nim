@@ -1,4 +1,4 @@
-import osproc, strutils, strformat, algorithm, cligen, terminaltables
+import osproc, strutils, strformat, algorithm, cligen, terminaltables, os, sequtils, json
 
 
 proc run(cmd: string): string =
@@ -77,7 +77,12 @@ proc ps() =
 
 proc save() =
     ## Save yakuake session to a file
-    echo "TODO save"
+    let configDirPath = joinPath(getConfigDir(), "yakuakep")
+    discard existsOrCreateDir(configDirPath)
+    let tabs = toSeq(getSessionData())
+    let filepath = joinPath(configDirPath, "default.json")
+    writeFile(filepath, $(pretty(%*tabs)))
+    echo(fmt"Yakuake tabs saved successfully to {filepath}")
     discard
 
 
