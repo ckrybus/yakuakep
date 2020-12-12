@@ -11,6 +11,6 @@ bin           = @["yakuakep"]
 
 # Dependencies
 
-requires "nim >= 1.2.4"
-requires "cligen >= 1.0.0"
+requires "nim >= 1.4.2"
+requires "cligen >= 1.3.2"
 requires "terminaltables >= 0.1.1"
