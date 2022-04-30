@@ -18,9 +18,9 @@ sudo apt-get install qdbus-qt5
 
 ## Features
 
-- display yakuake tabs
-- save yakuake tabs to a json file
-- restore yakuake tabs from a json file 
+- [x] display yakuake tabs
+- [x] save yakuake tabs to a json file
+- [ ] (TODO) restore yakuake tabs from a json file
 
 ## Usage
 
@@ -29,7 +29,6 @@ For now only a very basic interface exists
 ```bash
 $ yakuakep ps   # show all tabs
 $ yakuake save  # save tabs
-$ yakuake load  # load previously saved tabs
 ```
 
 ## Limitations
@@ -45,4 +44,3 @@ Welcome❤
 ## License
 
 MIT License. Please see [License File](LICENSE) for more information.
-

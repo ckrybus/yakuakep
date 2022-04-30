@@ -1,4 +1,5 @@
-import osproc, strutils, strformat, algorithm, cligen, terminaltables, os, sequtils, json
+import osproc, strutils, strformat, algorithm, cligen, terminaltables, os,
+        sequtils, json
 
 
 proc run(cmd: string): string =
@@ -32,27 +33,25 @@ proc getCmd(pid: int, fgpid: int): string =
     return ""
 
 
-iterator getSessionData(): Tab =
+iterator getTabs(): Tab =
     for i, _ in dbusMany(fmt"/yakuake/sessions sessionIdList"):
         # in yakuake you can have multiple terminals per tab
         # yakuakep currently supports only one terminal per tab
         var sessionId = dbus(fmt"/yakuake/tabs sessionAtTab {i}")
-        var terminalIdsRaw = dbusMany(fmt"/yakuake/sessions terminalIdsForSessionId {session_id}")
 
+        var terminalIdsRaw = dbusMany(fmt"/yakuake/sessions terminalIdsForSessionId {session_id}")
         # TODO how to sort by int in nim?
         var terminalIds = newSeq[int](0)
         for x in terminalIdsRaw:
             terminalIds.add(x.parseInt)
         terminalIds.sort()
         var terminalId = terminalIds[0]
-
         var title = dbus(fmt"/yakuake/tabs tabTitle {sessionId}")
         var sid = terminalId + 1
         var pid = dbus(fmt"/Sessions/{sid} processId").parseInt
         var fgpid = dbus(fmt"/Sessions/{sid} foregroundProcessId").parseInt
         var command = getCmd(pid, fgpid)
         var workingDirectory = getPwd(pid)
-
         yield Tab(command: command, workingDirectory: workingDirectory, title: title)
 
 
@@ -69,7 +68,7 @@ proc ps() =
     ## Show yakuake session
     var table = newTerminalTable()
     table.setHeaders(@["TITLE", "WORKING DIRECTORY", "COMMAND"])
-    for tab in getSessionData():
+    for tab in getTabs():
         table.addRow(@[tab.title, tab.workingDirectory, tab.command])
     printTable(table)
     discard
@@ -79,18 +78,18 @@ proc save() =
     ## Save yakuake session to a file
     let configDirPath = joinPath(getConfigDir(), "yakuakep")
     discard existsOrCreateDir(configDirPath)
-    let tabs = toSeq(getSessionData())
+    let tabs = toSeq(getTabs())
     let filepath = joinPath(configDirPath, "default.json")
     writeFile(filepath, $(pretty(%*tabs)))
     echo(fmt"Yakuake tabs saved successfully to {filepath}")
     discard
 
 
-proc load() =
-    ## Load yakuake session from a file
-    echo "TODO load"
+proc restore() =
+    ## Restore yakuake session from a file
+    echo "TODO restore"
     discard
 
 
 when isMainModule:
-    dispatchMulti([ps], [save], [load])
+    dispatchMulti([ps], [save], [restore])
